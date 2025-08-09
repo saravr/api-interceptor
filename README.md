@@ -31,11 +31,9 @@ sudo apt install apktool adb
 pip3 install mitmproxy
 ```
 
-### 2️⃣ Get the Scripts
+### 2️⃣ Clone this repository
 ```bash
-# Download scripts
-curl -O https://raw.githubusercontent.com/YOUR_REPO/modapk.sh
-curl -O https://raw.githubusercontent.com/YOUR_REPO/proxy_modifier.py
+git clone https://github.com/saravr/api-interceptor
 chmod +x modapk.sh
 ```
 
