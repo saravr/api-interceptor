@@ -6,76 +6,21 @@ Usage: mitmdump -s proxy_modifier.py -p 8080
 
 from mitmproxy import http
 import json
+import os
 import time
 from datetime import datetime
 
-# ============ CONFIGURATION ============
-# Add your API modifications here
+# Load modifications from external file
+def load_modifications():
+    config_file = "modifications.json"
+    if os.path.exists(config_file):
+        with open(config_file, 'r') as f:
+            return json.load(f)
+    else:
+        print(f"Warning: {config_file} not found, using empty config")
+        return {}
 
-MODIFICATIONS = {
-    "/api/users": {
-        "enabled": True,
-        "match_type": "path_contains",  # exact_path, path_contains, regex
-        "response": {
-            "status_code": 200,
-            "body": {
-                "results" : [
-                ],
-                "total" : 0,
-                "limit" : "50"
-            }
-        }
-    },
-    
-    # Example: Modify user data endpoint
-    "/api/user/profile": {
-        "enabled": True,
-        "match_type": "path_contains",
-        "response": {
-            "status_code": 500,
-            "body": {
-                "error": True,
-                "message": "Internal server error"
-            }
-        }
-    },
-    
-    # Example: Modify with delay
-    "/api/data": {
-        "enabled": True,
-        "match_type": "path_contains",
-        "delay": 5,  # Add 5 second delay
-        "response": {
-            "status_code": 408,
-            "body": {
-                "error": True,
-                "message": "Request timeout"
-            }
-        }
-    },
-    
-    # Example: Return empty array
-    "/api/items": {
-        "enabled": True,
-        "match_type": "exact_path",
-        "response": {
-            "status_code": 200,
-            "body": []
-        }
-    },
-    
-    # Example: Modify existing response (don't replace entirely)
-    "/api/config": {
-        "enabled": True,
-        "match_type": "path_contains",
-        "modify_existing": True,  # Modify the real response instead of replacing
-        "modifications": {
-            "premium": False,
-            "features.max_uploads": 0,
-            "features.enabled": False
-        }
-    }
-}
+MODIFICATIONS = load_modifications()
 
 # ============ COLOR OUTPUT ============
 class Colors:

@@ -1,0 +1,55 @@
+{
+  "/api/users": {
+    "enabled": true,
+    "match_type": "path_contains",
+    "response": {
+      "status_code": 200,
+      "body": {
+        "results": [],
+        "total": 0,
+        "limit": "50"
+      }
+    }
+  },
+  "/api/user/profile": {
+    "enabled": true,
+    "match_type": "path_contains",
+    "response": {
+      "status_code": 500,
+      "body": {
+        "error": true,
+        "message": "Internal server error"
+      }
+    }
+  },
+  "/api/data": {
+    "enabled": true,
+    "match_type": "path_contains",
+    "delay": 5,
+    "response": {
+      "status_code": 408,
+      "body": {
+        "error": true,
+        "message": "Request timeout"
+      }
+    }
+  },
+  "/api/items": {
+    "enabled": true,
+    "match_type": "exact_path",
+    "response": {
+      "status_code": 200,
+      "body": []
+    }
+  },
+  "/api/config": {
+    "enabled": true,
+    "match_type": "path_contains",
+    "modify_existing": true,
+    "modifications": {
+      "premium": false,
+      "features.max_uploads": 0,
+      "features.enabled": false
+    }
+  }
+}
