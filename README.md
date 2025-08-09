@@ -34,13 +34,14 @@ pip install mitmproxy
 ### 2️⃣ Clone this repository
 ```bash
 git clone https://github.com/saravr/api-interceptor
+cd api-interceptor
 chmod +x modapk.sh
 ```
 
 ### 3️⃣ Modify Your APK
 ```bash
 # Modify APK to accept proxy certificates
-./modapk.sh your-app.apk
+./modapk.sh -k <path-to-keystore-file> -p <keystore-password> -a <key-alias> your-app.apk
 
 # Install modified APK
 adb uninstall com.your.app.package  # Remove original
