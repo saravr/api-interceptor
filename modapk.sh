@@ -358,9 +358,9 @@ fi
 # Step 4: Rebuild APK
 log "Rebuilding APK..."
 if [ "$VERBOSE" = true ]; then
-    apktool b "$WORK_DIR" -o "$OUTPUT_APK" --use-aapt2
+    apktool b "$WORK_DIR" -o "$OUTPUT_APK"
 else
-    apktool b "$WORK_DIR" -o "$OUTPUT_APK" --use-aapt2 &> /dev/null
+    apktool b "$WORK_DIR" -o "$OUTPUT_APK" &> /dev/null
 fi
 
 if [ $? -ne 0 ]; then
