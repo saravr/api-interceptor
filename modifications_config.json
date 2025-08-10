@@ -1,7 +1,10 @@
 {
-  "/api/users": {
+  "/api/v1/library/bots": {
     "enabled": true,
-    "match_type": "path_contains",
+    "match_type": "query_param",
+    "query_params": {
+        "surface": ["onboardingPopular", "onboardingFriendFollowed"]
+    },
     "response": {
       "status_code": 200,
       "body": {

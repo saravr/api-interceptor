@@ -12,10 +12,16 @@ from datetime import datetime
 
 # Load modifications from external file
 def load_modifications():
-    config_file = "modifications.json"
+    config_file = "modifications_config.json"
     if os.path.exists(config_file):
-        with open(config_file, 'r') as f:
-            return json.load(f)
+        try:
+            with open(config_file, 'r') as f:
+                data = json.load(f)
+                print(f"[INFO] Loaded {len(data)} modification rules from {config_file}")
+                return data
+        except Exception as e:
+            print(f"[ERROR] Failed to load {config_file}: {e}")
+            return {}
     else:
         print(f"Warning: {config_file} not found, using empty config")
         return {}
@@ -31,6 +37,10 @@ class Colors:
     RED = '\033[91m'
     ENDC = '\033[0m'
     BOLD = '\033[1m'
+
+def log_debug(message):
+    """Log debug information"""
+    print(f"{Colors.BLUE}  [DEBUG] {message}{Colors.ENDC}")
 
 def log_request(flow):
     """Log incoming requests"""
@@ -67,27 +77,62 @@ def set_nested_value(obj, path, value):
 
 def should_modify(flow, config):
     """Check if this request should be modified"""
+    pattern = list(MODIFICATIONS.keys())[list(MODIFICATIONS.values()).index(config)]
+    
+    # Debug: Log what we're checking
+    log_debug(f"Checking rule: {pattern}")
+    log_debug(f"Request path: {flow.request.path}")
+    log_debug(f"Query params: {dict(flow.request.query)}")
+    
     if not config.get("enabled", True):
+        log_debug("Rule disabled, skipping")
         return False
     
     path = flow.request.path
     match_type = config.get("match_type", "path_contains")
-    pattern = list(MODIFICATIONS.keys())[list(MODIFICATIONS.values()).index(config)]
+    log_debug(f"Match type: {match_type}")
     
     if match_type == "exact_path":
-        return path == pattern
+        result = path == pattern
+        log_debug(f"Exact path match: {result}")
+        return result
     elif match_type == "path_contains":
-        return pattern in path
-    elif match_type == "regex":
-        import re
-        return re.search(pattern, path) is not None
+        result = pattern in path
+        log_debug(f"Path contains match: {result}")
+        return result
+    elif match_type == "query_param":
+        query_params = dict(flow.request.query)
+        required_params = config.get("query_params", {})
+        log_debug(f"Required params: {required_params}")
+        
+        for param, value in required_params.items():
+            if param not in query_params:
+                log_debug(f"Missing required param: {param}")
+                return False
+            if value is not None:
+                if isinstance(value, list):
+                    if query_params[param] not in value:
+                        log_debug(f"Param {param}={query_params[param]} not in allowed values {value}")
+                        return False
+                else:
+                    if query_params[param] != value:
+                        log_debug(f"Param {param}={query_params[param]} != required {value}")
+                        return False
+        
+        path_match = pattern in path
+        log_debug(f"Query params matched, path contains check: {path_match}")
+        return path_match
     
     return False
 
 # ============ MAIN MODIFICATION LOGIC ============
 def response(flow: http.HTTPFlow) -> None:
     """Main function that modifies responses"""
-    
+
+    # Debug: Basic info
+    print(f"{Colors.BLUE}[DEBUG] Response function called for: {flow.request.path}{Colors.ENDC}")
+    print(f"{Colors.BLUE}[DEBUG] Number of modification rules: {len(MODIFICATIONS)}{Colors.ENDC}")
+
     # Log the request
     log_request(flow)
     
