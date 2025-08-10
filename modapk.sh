@@ -403,6 +403,7 @@ if [ -n "$APKSIGNER" ]; then
             --ks-pass "pass:$STOREPASS" \
             --ks-key-alias "$ALIAS" \
             --key-pass "pass:$STOREPASS" \
+            --v4-signing-enabled false \
             --out "$OUTPUT_APK" \
             "$ALIGNED_APK"
     else
@@ -410,6 +411,7 @@ if [ -n "$APKSIGNER" ]; then
             --ks-pass "pass:$STOREPASS" \
             --ks-key-alias "$ALIAS" \
             --key-pass "pass:$STOREPASS" \
+            --v4-signing-enabled false \
             --out "$OUTPUT_APK" \
             "$ALIGNED_APK" &> /dev/null
     fi
